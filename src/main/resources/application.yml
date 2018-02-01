@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: wx
+  data:
+    mongodb:
+      uri: mongodb://admin:123456@localhost:27017/ashman-wx
+server:
+  port: 80
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:21000/eureka/
+ashman:
+  wx:
+    app-id: wxfc19e603b952816b
+    server:
+      token: ashman000odd
+      encoding-aes-key: 0X6nPs1kYqbxggNnD8QAjFBxM1g0LrvLvvkhfa7RVhY
+      encoding-aes-key-length: 43
+      mode: compat
+  thread:
+    pool:
+      core-pool-size: 10
+      maximum-pool-size: 20
+      keep-alive-time: 0
+      time-unit: milliseconds
+      queue-size: 1024
+logging:
+  path: .

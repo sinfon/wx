@@ -14,6 +14,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
+ * 微信发送明文模式消息，无 Encrypt 元素，仅有明文元素 <br/>
+ * 密文模式有 Encrypt 元素，以及 ToUserName 元素，无明文元素 <br/>
+ * 兼容模式则是全部都会发送过来
+ *
  * @author singoasher
  * @date 2018/1/31
  */

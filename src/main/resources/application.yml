@@ -5,7 +5,7 @@ spring:
     mongodb:
       uri: mongodb://admin:123456@localhost:27017/ashman-wx
 server:
-  port: 80
+  port: 21002
 eureka:
   instance:
     hostname: localhost

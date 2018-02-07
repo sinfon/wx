@@ -1,8 +1,8 @@
-package top.ashman.wx.infrastructure.util.aes;
+package top.ashman.wx.infrastructure.util.security;
 
 import java.util.ArrayList;
 
-class ByteGroup {
+public class ByteGroup {
 	ArrayList<Byte> byteContainer = new ArrayList<Byte>();
 
 	public byte[] toBytes() {

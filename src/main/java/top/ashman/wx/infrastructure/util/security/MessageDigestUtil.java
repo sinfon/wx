@@ -1,8 +1,9 @@
-package top.ashman.wx.infrastructure.util;
+package top.ashman.wx.infrastructure.util.security;
 
 import org.apache.commons.codec.binary.Hex;
+import top.ashman.wx.infrastructure.util.WxConstants;
+import top.ashman.wx.infrastructure.util.security.Algorithm;
 
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -22,7 +23,7 @@ public class MessageDigestUtil {
         for (String s : input) {
             stringBuilder.append(s);
         }
-        return stringBuilder.toString().getBytes(Charset.forName(WxConsts.DEFAULT_CHARSET_NAME));
+        return stringBuilder.toString().getBytes(WxConstants.DEFAULT_CHARSET);
     }
 
     /**

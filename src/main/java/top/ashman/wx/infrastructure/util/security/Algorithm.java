@@ -1,4 +1,4 @@
-package top.ashman.wx.infrastructure.util;
+package top.ashman.wx.infrastructure.util.security;
 
 /**
  * @author singoasher

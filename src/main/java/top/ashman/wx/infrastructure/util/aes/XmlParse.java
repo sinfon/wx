@@ -2,6 +2,7 @@ package top.ashman.wx.infrastructure.util.aes;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
@@ -26,8 +27,7 @@ class XmlParse {
 	 * @throws DocumentException
 	 */
 	public static Object[] extract(String xmlString) throws DocumentException {
-		SAXReader saxReader = new SAXReader();
-		Document document = saxReader.read(xmlString);
+		Document document = DocumentHelper.parseText(xmlString);
 
 		Element root = document.getRootElement();
 		String encrypt = root.element("Encrypt").getStringValue();

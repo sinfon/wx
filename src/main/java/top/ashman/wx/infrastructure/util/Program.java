@@ -25,9 +25,10 @@ public class Program {
 		String timestamp = "1409304348";
 		String nonce = "xxxxxx";
 		String appId = "wxb11529c136998cb6";
-		String replyMsg = " 中文<xml><ToUserName><![CDATA[oia2TjjewbmiOUlr6X-1crbLOvLw]]></ToUserName><FromUserName><![CDATA[gh_7f083739789a]]></FromUserName><CreateTime>1407743423</CreateTime><MsgType><![CDATA[video]]></MsgType><Video><MediaId><![CDATA[eYJ1MbwPRJtOvIEabaxHs7TX2D-HV71s79GUxqdUkjm6Gs2Ed1KF3ulAOA9H1xG0]]></MediaId><Title><![CDATA[testCallBackReplyVideo]]></Title><Description><![CDATA[testCallBackReplyVideo]]></Description></Video></xml>";
+		String replyMsg = "你好";
+				// " 中文<xml><ToUserName><![CDATA[oia2TjjewbmiOUlr6X-1crbLOvLw]]></ToUserName><FromUserName><![CDATA[gh_7f083739789a]]></FromUserName><CreateTime>1407743423</CreateTime><MsgType><![CDATA[video]]></MsgType><Video><MediaId><![CDATA[eYJ1MbwPRJtOvIEabaxHs7TX2D-HV71s79GUxqdUkjm6Gs2Ed1KF3ulAOA9H1xG0]]></MediaId><Title><![CDATA[testCallBackReplyVideo]]></Title><Description><![CDATA[testCallBackReplyVideo]]></Description></Video></xml>";
 
-		WxBizMsgCrypt pc = new WxBizMsgCrypt(token, encodingAesKey, appId);
+		WxBizMsgCrypt pc = new WxBizMsgCrypt(appId, token, encodingAesKey, 43);
 		String mingwen = pc.encryptMsg(replyMsg, timestamp, nonce);
 		System.out.println("加密后: " + mingwen);
 

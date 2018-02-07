@@ -15,11 +15,12 @@ eureka:
 ashman:
   wx:
     app-id: wxfc19e603b952816b
+    mode: compat
     server:
       token: ashman000odd
-      encoding-aes-key: 0X6nPs1kYqbxggNnD8QAjFBxM1g0LrvLvvkhfa7RVhY
-      encoding-aes-key-length: 43
-      mode: compat
+      encoding-a-e-s-key: 0X6nPs1kYqbxggNnD8QAjFBxM1g0LrvLvvkhfa7RVhY
+      encoding-a-e-s-key-length: 43
+
   thread:
     pool:
       core-pool-size: 10

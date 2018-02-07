@@ -1,8 +1,8 @@
-package top.ashman.wx.application.impl;
+package top.ashman.wx.application.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import top.ashman.wx.application.AuthenticationService;
+import top.ashman.wx.application.service.AuthenticationService;
 import top.ashman.wx.config.property.WxProperties;
 import top.ashman.wx.domain.model.authentication.Authentication;
 import top.ashman.wx.interfaces.AuthenticationQuery;
@@ -21,12 +21,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public String authenticate(AuthenticationQuery authenticationQuery) {
-        Authentication authentication = new Authentication(
-                authenticationQuery.getSignature(),
-                authenticationQuery.getTimestamp(),
-                authenticationQuery.getNonce(),
-                authenticationQuery.getEchostr(),
+    public boolean authenticate(String signature, String timestamp, String nonce) {
+        Authentication authentication = new Authentication(signature, timestamp, nonce,
                 wxProperties.getServer().getToken());
         return authentication.authenticate();
     }

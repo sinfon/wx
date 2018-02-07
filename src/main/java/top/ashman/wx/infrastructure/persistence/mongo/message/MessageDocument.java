@@ -13,7 +13,7 @@ import java.time.Instant;
  */
 @Data
 @Builder
-@Document
+@Document(collection = "message")
 public class MessageDocument {
     @Id
     private String id;
@@ -23,4 +23,5 @@ public class MessageDocument {
     private String msgType;
     private String content;
     private String msgId;
+    private String encrypt;
 }

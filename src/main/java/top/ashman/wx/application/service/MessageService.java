@@ -15,5 +15,11 @@ public interface MessageService {
      * @return 处理结果
      */
     String handle(Message message);
+
+    /**
+     * 保存消息
+     * @param message 消息
+     * @return 保存后的消息
+     */
     Message save(Message message);
 }

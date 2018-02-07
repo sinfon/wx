@@ -3,7 +3,7 @@ package top.ashman.wx.infrastructure.util.security;
 /**
  * @author Tecent Sample Code
  */
-public class AesException extends Exception {
+public class AesException extends RuntimeException {
 	public final static int VALIDATE_SIGNATURE_ERROR = -40001;
 	public final static int PARSE_XML_ERROR = -40002;
 	public final static int COMPUTE_SIGNATURE_ERROR = -40003;

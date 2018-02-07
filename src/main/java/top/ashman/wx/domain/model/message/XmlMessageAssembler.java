@@ -1,11 +1,13 @@
-package top.ashman.wx.interfaces;
+package top.ashman.wx.domain.model.message;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import top.ashman.wx.domain.model.message.Message;
+import top.ashman.wx.infrastructure.util.WxConstants;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -15,17 +17,49 @@ import java.util.Optional;
  * @date 2018/2/2
  */
 public class XmlMessageAssembler {
-    public static Message assemble(String xmlString) throws DocumentException {
-        Document document = DocumentHelper.parseText(xmlString);
-        Element root = document.getRootElement();
-        String toUserName = parseStringValue(root, ElementNames.TO_USER_NAME);
-        String fromUserName = parseStringValue(root, ElementNames.FROM_USER_NAME);
-        Instant createTime = parseTimestampValue(root, ElementNames.CREATE_TIME);
-        String msgType = parseStringValue(root, ElementNames.MSG_TYPE);
-        String content = parseStringValue(root, ElementNames.CONTENT);
-        String msgId = parseStringValue(root, ElementNames.MSG_ID);
-        String encrypt = parseStringValue(root, ElementNames.ENCRYPT);
-        return new Message(toUserName, fromUserName, createTime, msgType, content, msgId, encrypt);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlMessageAssembler.class);
+
+    public static Message assemble(String xmlMessage) {
+        return Optional.ofNullable(getRootElement(xmlMessage))
+                .map(root -> {
+                    String toUserName = parseStringValue(root, ElementNames.TO_USER_NAME);
+                    String fromUserName = parseStringValue(root, ElementNames.FROM_USER_NAME);
+                    Instant createTime = parseTimestampValue(root, ElementNames.CREATE_TIME);
+                    String msgType = parseStringValue(root, ElementNames.MSG_TYPE);
+                    String content = parseStringValue(root, ElementNames.CONTENT);
+                    String msgId = parseStringValue(root, ElementNames.MSG_ID);
+                    String encrypt = parseStringValue(root, ElementNames.ENCRYPT);
+                    return new Message(toUserName, fromUserName, createTime, msgType, content, msgId, encrypt);
+                })
+                .orElse(null);
+    }
+
+    static void assembleDecrypted(String decryptedXmlMessage, Message message) {
+        Optional.ofNullable(getRootElement(decryptedXmlMessage)).ifPresent(root -> {
+            LOGGER.info("Ready to assemble decrypted xml message into giving message");
+            Optional.ofNullable(parseStringValue(root, ElementNames.TO_USER_NAME)).ifPresent(toUserName -> {
+                if (toUserName.equals(message.getToUserName())) {
+                    LOGGER.info("Begin to assemble decrypted xml message into giving message");
+                    message.setFromUserName(parseStringValue(root, ElementNames.FROM_USER_NAME));
+                    message.setCreateTime(parseTimestampValue(root, ElementNames.CREATE_TIME));
+                    message.setMsgType(parseStringValue(root, ElementNames.MSG_TYPE));
+                    message.setContent(parseStringValue(root, ElementNames.CONTENT));
+                    message.setMsgId(parseStringValue(root, ElementNames.MSG_ID));
+                    LOGGER.info("Have assembled decrypted xml message into giving message");
+                } else {
+                    LOGGER.error("Different ToUserName, NOT assemble decrypted xml message into giving message");
+                }
+            });
+        });
+    }
+
+    private static Element getRootElement(String xmlMessage) {
+        try {
+            return DocumentHelper.parseText(xmlMessage).getRootElement();
+        } catch (DocumentException e) {
+            LOGGER.error("Xml message parse error, return null");
+            return null;
+        }
     }
 
     private static String parseStringValue(Element root, String elementName) {
@@ -71,18 +105,17 @@ public class XmlMessageAssembler {
      * @param content Message
      * @return Xml String
      */
-    private static String generateClearXml(String to, String from, String content) {
+    public static String generateClearXml(String to, String from, String timestamp, String content) {
         if (StringUtils.isEmpty(content)) {
-            return "success";
+            return WxConstants.SUCESS_MESSAGE;
         }
 
         return  "<xml>\n" +
                 "<ToUserName><![CDATA[" + to + "]]>\n" +
                 "</ToUserName><FromUserName><![CDATA[" + from + "]]></FromUserName>\n" +
-                "<CreateTime>" + Instant.now().toEpochMilli() + "</CreateTime>\n" +
+                "<CreateTime>" + timestamp + "</CreateTime>\n" +
                 "<MsgType><![CDATA[text]]></MsgType>\n" +
                 "<Content><![CDATA[" + content + "]]></Content>\n" +
-                "<FuncFlag>0</FuncFlag>\n" +
                 "</xml>";
     }
 

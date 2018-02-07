@@ -1,13 +1,18 @@
 package top.ashman.wx.application.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import top.ashman.wx.application.client.OddClient;
 import top.ashman.wx.application.service.MessageService;
 import top.ashman.wx.config.property.WxProperties;
 import top.ashman.wx.domain.model.message.Message;
 import top.ashman.wx.domain.model.message.MessageRepository;
+import top.ashman.wx.domain.model.message.XmlMessageAssembler;
+import top.ashman.wx.infrastructure.util.WxConstants;
+import top.ashman.wx.infrastructure.util.security.AESUtil;
+import top.ashman.wx.infrastructure.util.security.SHA1Util;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -19,6 +24,8 @@ import java.util.concurrent.ExecutorService;
  */
 @Service
 public class MessageServiceImpl implements MessageService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageServiceImpl.class);
+
     private MessageRepository messageRepository;
     private OddClient oddClient;
     private WxProperties wxProperties;
@@ -37,16 +44,23 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public String handle(Message message) {
+        LOGGER.info("Message Received After Assemble: {}", message.toString());
+        executorService.execute(() -> save(message));
+
+        String timestamp = String.valueOf(Instant.now().toEpochMilli());
         switch (wxProperties.getMode()) {
             case CLEAR:
-                return handleCipherText(message);
+                // 明文模式，仅处理明文消息
+                return handleClearText(message, timestamp);
             case CIPHER:
-                return handleCipherText(message);
+                // 安全模式，仅处理加密消息
+                return handleCipherText(message, timestamp);
             case COMPAT:
+                // 兼容模式，优先处理加密消息
                 if (Optional.ofNullable((message.getEncrypt())).isPresent()) {
-                    return handleCipherText(message);
+                    return handleCipherText(message, timestamp);
                 } else {
-                    return handleClearText(message);
+                    return handleClearText(message, timestamp);
                 }
             default:
                 return null;
@@ -58,13 +72,37 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.save(message);
     }
 
-    private String handleCipherText(Message message) {
-        return "success";
+    private String handleClearText(Message message, String timestamp) {
+        String returnXmlMessage = handleMessage(message, timestamp);
+        LOGGER.info("Clear Xml Message Return: {}", returnXmlMessage);
+        return returnXmlMessage;
     }
 
-    private String handleClearText(Message message) {
-        executorService.execute(() -> save(message));
+    private String handleCipherText(Message message, String timestamp) {
+        String encodingAESKey = wxProperties.getServer().getEncodingAESKey();
+        Integer encodingAESKeyLength = wxProperties.getServer().getEncodingAESKeyLength();
+        String appId = wxProperties.getAppId();
+        String token = wxProperties.getServer().getToken();
 
+        String clearText = handleMessage(
+                message.decrypt(encodingAESKey, encodingAESKeyLength, wxProperties.getAppId()),
+                timestamp);
+
+        if (WxConstants.SUCESS_MESSAGE.equals(clearText)) {
+            LOGGER.info("Cipher Xml Message Return: {}", WxConstants.SUCESS_MESSAGE);
+            return WxConstants.SUCESS_MESSAGE;
+        }
+
+        String nonce = AESUtil.generateNonce();
+        String encrypt = AESUtil.encrypt(nonce, clearText, appId, encodingAESKey);
+        String signature = SHA1Util.getSignature(token, timestamp, nonce, encrypt);
+
+        String returnXmlMessage = XmlMessageAssembler.generateCipherXml(encrypt, signature, timestamp, nonce);
+        LOGGER.info("Cipher Xml Message Return: {}", returnXmlMessage);
+        return returnXmlMessage;
+    }
+
+    private String handleMessage(Message message, String timestamp) {
         String toUserName = message.getToUserName();
         String fromUserName = message.getFromUserName();
         String content = message.getContent();
@@ -77,29 +115,6 @@ public class MessageServiceImpl implements MessageService {
             default:
         }
 
-        return formatXmlAnswer(fromUserName, toUserName, replyContent.toString());
-    }
-
-    /**
-     * 封装文字类的返回消息
-     *
-     * @param to Message To
-     * @param from Message From
-     * @param content Message
-     * @return Xml String
-     */
-    private static String formatXmlAnswer(String to, String from, String content) {
-        if (StringUtils.isEmpty(content)) {
-            return "success";
-        }
-
-        return  "<xml>" +
-                "<ToUserName><![CDATA[" + to + "]]>" +
-                "</ToUserName><FromUserName><![CDATA[" + from + "]]></FromUserName>" +
-                "<CreateTime>" + Instant.now().toEpochMilli() + "</CreateTime>" +
-                "<MsgType><![CDATA[text]]></MsgType>" +
-                "<Content><![CDATA[" + content + "]]></Content>" +
-                "<FuncFlag>0</FuncFlag>" +
-                "</xml>";
+        return XmlMessageAssembler.generateClearXml(fromUserName, toUserName, timestamp, replyContent.toString());
     }
 }

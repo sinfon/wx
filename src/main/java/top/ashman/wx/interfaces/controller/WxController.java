@@ -10,7 +10,7 @@ import top.ashman.wx.application.service.AuthenticationService;
 import top.ashman.wx.application.service.MessageService;
 import top.ashman.wx.config.property.WxProperties;
 import top.ashman.wx.interfaces.AuthenticationQuery;
-import top.ashman.wx.interfaces.XmlMessageAssembler;
+import top.ashman.wx.domain.model.message.XmlMessageAssembler;
 
 import java.io.IOException;
 import java.text.ParseException;

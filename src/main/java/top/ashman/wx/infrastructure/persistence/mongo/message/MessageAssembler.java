@@ -19,6 +19,7 @@ public class MessageAssembler {
                         .msgType(m.getMsgType())
                         .content(m.getContent())
                         .msgId(m.getMsgId())
+                        .msgId(m.getEncrypt())
                         .build())
                 .orElse(null);
     }
@@ -33,6 +34,7 @@ public class MessageAssembler {
                         .msgType(m.getMsgType())
                         .content(m.getContent())
                         .msgId(m.getMsgId())
+                        .encrypt(m.getEncrypt())
                         .build())
                 .orElse(null);
     }

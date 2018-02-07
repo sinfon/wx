@@ -20,7 +20,6 @@ ashman:
       token: ashman000odd
       encoding-a-e-s-key: 0X6nPs1kYqbxggNnD8QAjFBxM1g0LrvLvvkhfa7RVhY
       encoding-a-e-s-key-length: 43
-
   thread:
     pool:
       core-pool-size: 10

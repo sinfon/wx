@@ -1,5 +1,6 @@
-package top.ashman.wx.domain.model.task;
+package top.ashman.wx.application.odd.task;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  * @date 2018/1/29
  */
 @Data
+@Builder
 public class TaskCommand {
     private String content;
 }

@@ -58,7 +58,8 @@ public class Message {
      */
     private String encrypt;
 
-    Message(String toUserName, String fromUserName, Instant createTime, String msgType, String content, String msgId, String encrypt) {
+    Message(String toUserName, String fromUserName, Instant createTime, String msgType, String content,
+            String msgId, String encrypt) {
         this.toUserName = toUserName;
         this.fromUserName = fromUserName;
         this.createTime = createTime;
@@ -88,5 +89,15 @@ public class Message {
         LOGGER.info("After Assemble Decrypted Message: {}", this.toString());
 
         return this;
+    }
+
+    public static Message copy(Message message) {
+        return new Message(message.getToUserName(),
+                message.getFromUserName(),
+                message.getCreateTime(),
+                message.getMsgType(),
+                message.getContent(),
+                message.getMsgId(),
+                message.getEncrypt());
     }
 }

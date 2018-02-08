@@ -19,6 +19,9 @@ import top.ashman.wx.infrastructure.util.security.AESUtil;
 import top.ashman.wx.infrastructure.util.security.SHA1Util;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -134,8 +137,12 @@ public class MessageServiceImpl implements MessageService {
                                     return ReplyMessage.LIST_TASK.abnormalReply();
                                 } else {
                                     list.forEach(t ->
-                                            stringBuilder.append("\n").append(t.getCreatedTime())
-                                                    .append("\n").append(t.getContent())
+                                            stringBuilder.append("\n")
+                                                    .append(DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                                                            .format(Instant.parse(t.getCreatedTime())
+                                                                    .atZone(ZoneId.systemDefault())))
+                                                    .append("\n")
+                                                    .append(t.getContent())
                                                     .append("\n"));
                                     return stringBuilder.toString();
                                 }
